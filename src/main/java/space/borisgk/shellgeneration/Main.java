@@ -3,6 +3,7 @@ package space.borisgk.shellgeneration;
 import org.gradle.api.GradleException;
 import space.borisgk.shellgeneration.exception.GenerationPluginException;
 
+import java.util.HashSet;
 import java.util.List;
 
 public class Main {
@@ -14,10 +15,14 @@ public class Main {
                 srcPackage = "com.mera.borisgk98.autoshowroom.client.models";
                 generationRoot = "/home/boris/progs/work/chellgeneration/src/main/java";
                 generationPackage = "test.generation";
+                excludeModels = new HashSet<String>(){{
+//                    add("Auto");
+                }};
             }});
         }
         catch (GenerationPluginException e) {
             throw new GradleException("Bad generation params", e);
         }
+        generator.generate();
     }
 }

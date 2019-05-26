@@ -5,13 +5,14 @@ import space.borisgk.shellgeneration.exception.GenerationPluginException;
 import space.borisgk.shellgeneration.util.PackageToPathConverter;
 
 import org.antlr.stringtemplate.StringTemplate;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+
+import java.io.*;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class Generator {
@@ -22,12 +23,14 @@ public class Generator {
     private ClassLoader classLoader;
     private Logger logger = Logger.getLogger("gl");
     private List<Class> models;
+    private Set<String> excludeModels;
     private StringTemplate template;
 
     public void setUp(GenerationPluginExtension e) throws GenerationPluginException {
         generationPackage = e.getGenerationPackage();
         srcPackage = e.getSrcPackage();
         srcDir = Paths.get(e.getSrcRoot()).toFile();
+        excludeModels = e.getExcludeModels();
         if (!srcDir.exists()) {
             throw new GenerationPluginException(String.format("srcRoot %s does not exist", e.getSrcRoot()));
         }
@@ -48,17 +51,27 @@ public class Generator {
         }
         classLoader = new ClassLoader(srcDir, srcPackage);
         models = getModelClasses();
-        File templateSrc;
         try {
-            templateSrc = new File(getClass().getResource("ShellComponent").toURI());
-            if (!templateSrc.exists()) {
-                throw new FileNotFoundException("Not found " + templateSrc.toString());
-            }
-            template = new StringTemplate(getFileData(templateSrc));
+            String templateSrc = inputStreamToString(getClass().getClassLoader().getResourceAsStream(("ShellComponent")));
+            template = new StringTemplate(templateSrc);
         }
         catch (Exception ex) {
             throw new GenerationPluginException(ex);
         }
+    }
+
+    public String inputStreamToString(InputStream inputStream) throws IOException {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        String line = null;
+
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+        }
+
+        return stringBuilder.toString();
     }
 
     protected String getFileData(File file) throws IOException {
@@ -68,8 +81,15 @@ public class Generator {
     private List<Class> getModelClasses() {
         List<Class> apiClasses = new ArrayList<>();
         for (File file : srcPackageDir.listFiles()) {
+            if (excludeModels.contains(fileModelName(file))) {
+                continue;
+            }
             try {
-                apiClasses.add(classLoader.loadClass(getClassName(file)));
+                Class c = classLoader.loadClass(getClassName(file));
+                if (c.isEnum() || c.isInterface()) {
+                    continue;
+                }
+                apiClasses.add(c);
             }
             catch (Exception e) {
                 logger.warning(String.format("Cannot get class from %s", file.getAbsolutePath()));
@@ -81,12 +101,14 @@ public class Generator {
         return apiClasses;
     }
 
-    private String getClassName(File file) {
+    private String fileModelName(File file) {
         String fileName = file.getName();
-        if (!fileName.substring(fileName.length() - 6).equals(".class")) {
-            throw new IllegalArgumentException();
-        }
-        return srcPackage + "." + fileName.substring(0, fileName.length() - 6);
+        return fileName.substring(0, fileName.length() - 6);
+    }
+
+    private String getClassName(File file) {
+        String modelName = fileModelName(file);
+        return srcPackage + "." + modelName;
     }
 
     public void generate() {
@@ -96,6 +118,20 @@ public class Generator {
     }
 
     private void generateShellComponent(Class m) {
-        
+        List<String> fields = getFields(m);
+        String name = m.getSimpleName();
+        System.out.println(name + ":");
+        for (String s : fields) {
+            System.out.println("\t" + s);
+        }
+        System.out.println();
+    }
+
+    private List<String> getFields(Class m) {
+        List<String> res = new ArrayList<>();
+        for (Field field : m.getDeclaredFields()) {
+            res.add(field.getName());
+        }
+        return res;
     }
 }

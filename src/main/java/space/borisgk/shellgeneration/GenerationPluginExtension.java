@@ -1,10 +1,21 @@
 package space.borisgk.shellgeneration;
 
+import java.util.Set;
+
 public class GenerationPluginExtension {
     protected String srcRoot;
     protected String generationPackage;
     protected String srcPackage;
     protected String generationRoot;
+    protected Set<String> excludeModels;
+
+    public Set<String> getExcludeModels() {
+        return excludeModels;
+    }
+
+    public void setExcludeModels(Set<String> excludeModels) {
+        this.excludeModels = excludeModels;
+    }
 
     public String getGenerationPackage() {
         return generationPackage;
