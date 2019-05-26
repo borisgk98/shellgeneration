@@ -1,0 +1,33 @@
+group = 'space.borisgk'
+version = '0.1'
+
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+dependencies {
+    compile gradleApi()
+    repositories {
+        mavenCentral()
+    }
+    compile 'org.antlr:stringtemplate:3.2'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+buildscript {
+    repositories {
+        mavenLocal()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+
+    }
+}
