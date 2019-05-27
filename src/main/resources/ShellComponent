@@ -1,10 +1,6 @@
-package com.mera.borisgk98.autoshowroom.client.shell.components;
+package com.mera.borisgk98.autoshowroom.soapclient.component;
 
 
-import com.mera.borisgk98.autoshowroom.client.exceptions.ModelNotFound;
-import com.mera.borisgk98.autoshowroom.client.models.*;
-import com.mera.borisgk98.autoshowroom.client.shell.components.AbstractShellComponent;
-import com.mera.borisgk98.autoshowroom.client.shell.components.ReadDeleteShellComponent;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
@@ -25,9 +21,9 @@ public class $Model$ShellComponent extends AbstractShellComponent<$Model$> imple
             key = "$model$ create"
     )
     public String create($paramsBlock$) {
-        return crudService.create(new $Model$(){{
-               $settersBlock$
-        }}).toString();
+        $Model$ $model$ = new $Model$();
+        $settersBlock$
+        return crudService.create($model$).toString();
     }
 
     @ShellMethod(
@@ -38,10 +34,10 @@ public class $Model$ShellComponent extends AbstractShellComponent<$Model$> imple
     public String update(
             @ShellOption Integer id, $paramsBlock$) {
         try {
-            return crudService.update(new $Model$(){{
-                setId(id);
-                $settersBlock$
-            }}).toString();
+            $Model$ $model$ = new $Model$();
+            $model$.setId(id);
+            $settersBlock$
+            return crudService.update($model$).toString();
         }
         catch (ModelNotFound e) {
             return "Not found";

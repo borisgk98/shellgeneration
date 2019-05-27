@@ -26,12 +26,14 @@ public class Generator {
     private List<Class> models;
     private Set<String> excludeModels;
     private StringTemplate template;
+    private String templateSrc;
 
     public void setUp(GenerationPluginExtension e) throws GenerationPluginException {
         generationPackage = e.getGenerationPackage();
         srcPackage = e.getSrcPackage();
         srcDir = Paths.get(e.getSrcRoot()).toFile();
         excludeModels = e.getExcludeModels();
+        templateSrc = e.getTemplateSrc();
         if (!srcDir.exists()) {
             throw new GenerationPluginException(String.format("srcRoot %s does not exist", e.getSrcRoot()));
         }
@@ -53,8 +55,8 @@ public class Generator {
         classLoader = new ClassLoader(srcDir, srcPackage);
         models = getModelClasses();
         try {
-            String templateSrc = getFileData(new File("/home/boris/progs/work/chellgeneration/src/main/resources/ShellComponent"));
-            template = new StringTemplate(templateSrc);
+            String templateSrcData = getFileData(new File(templateSrc));
+            template = new StringTemplate(templateSrcData);
         }
         catch (Exception ex) {
             throw new GenerationPluginException(ex);
@@ -122,7 +124,7 @@ public class Generator {
         List<Field> fields = getFields(m);
         String Model = m.getSimpleName();
         String model = Model.toLowerCase();
-        String settersBlock = generateSettersBlock(fields);
+        String settersBlock = generateSettersBlock(fields, model);
         String paramsBlock = generateParamsBlock(fields);
 
         template.setAttribute("model", model);
@@ -186,12 +188,13 @@ public class Generator {
 //        return "";
     }
 
-    private String generateSettersBlock(List<Field> fields) {
+    private String generateSettersBlock(List<Field> fields, String model) {
         StringBuilder builder = new StringBuilder();
-        String tabLevel = "\t\t\t";
+        String tabLevel = "\t\t";
 
         for (int i = 0; i < fields.size(); i++) {
             Field f = fields.get(i);
+            String fname = f.getName();
             Class ftype = f.getType();
 
             if (ftype.isEnum()) {
@@ -202,24 +205,41 @@ public class Generator {
             }
 
             String name = f.getName();
-            String setterName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
-            builder.append(setterName);
-            builder.append("(");
             // примитивы
             if (Number.class.isAssignableFrom(ftype) ||
                 String.class.equals(ftype)
             ) {
+                builder.append(model);
+                builder.append(".");
+                String setterName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
+                builder.append(setterName);
+                builder.append("(");
                 builder.append(name);
             }
             // другой объект
             else {
-                builder.append("new ");
-                builder.append(ftype.getSimpleName());
-                builder.append("(){{ setId(");
-                builder.append(name);
-                builder.append("); }}");
-            }
+                String ftypeName = ftype.getSimpleName();
+                String ftypeLowerName = ftypeName.toLowerCase();
+                builder.append(ftypeName);
+                builder.append(" ");
+                builder.append(ftypeLowerName);
+                builder.append(" = new ");
+                builder.append(ftypeName);
+                builder.append("();\n");
 
+                builder.append(tabLevel);
+                builder.append(ftypeLowerName);
+                builder.append(".setId(");
+                builder.append(name);
+                builder.append(");\n");
+
+                builder.append(model);
+                builder.append(".");
+                String setterName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
+                builder.append(setterName);
+                builder.append("(");
+                builder.append(ftypeLowerName);
+            }
             builder.append(")");
             builder.append(";");
             builder.append("\n");

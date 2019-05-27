@@ -7,12 +7,46 @@ apply plugin: 'java'
 
 sourceCompatibility = 1.8
 
+
+configurations {
+    cxf
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+}
+
 dependencies {
     compile gradleApi()
     repositories {
         mavenCentral()
     }
     compile 'org.antlr:stringtemplate:3.2'
+
+
+
+    // soap
+    compile("junit:junit")
+    implementation 'org.springframework.shell:spring-shell-starter:2.0.0.RELEASE'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    compile("io.springfox:springfox-swagger2:2.9.2")
+
+    cxf "org.apache.cxf:cxf-tools-wsdlto-core:$cxfVersion"
+    cxf "org.apache.cxf:cxf-tools-wsdlto-frontend-jaxws:$cxfVersion"
+    cxf "org.apache.cxf:cxf-tools-wsdlto-databinding-jaxb:$cxfVersion"
+
+
+    cxf "org.jvnet.jaxb2_commons:jaxb2-fluent-api:3.0"
+    cxf "org.apache.cxf.xjcplugins:cxf-xjc-ts:$xjcVersion"
+
+    cxf "org.jvnet.jaxb2_commons:jaxb2-basics:$jaxb2BasicsVersion"
+
+    compile "org.apache.cxf.xjc-utils:cxf-xjc-runtime:$xjcVersion"
+    compile "org.jvnet.jaxb2_commons:jaxb2-basics-runtime:$jaxb2BasicsVersion"
+    compile 'commons-lang:commons-lang:2.6'
+
+    testCompile 'junit:junit:4.12'
 }
 
 repositories {
@@ -21,6 +55,12 @@ repositories {
 }
 
 buildscript {
+    ext {
+        xjcVersion= '3.0.5'
+        jaxbOutputDir = "$buildDir/generated/cxf"
+        jaxb2BasicsVersion = '0.11.0'
+        cxfVersion = '3.3.1'
+    }
     repositories {
         mavenLocal()
         maven {

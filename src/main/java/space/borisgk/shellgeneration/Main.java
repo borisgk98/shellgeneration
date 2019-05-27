@@ -11,13 +11,14 @@ public class Main {
         Generator generator = new Generator();
         try {
             generator.setUp(new GenerationPluginExtension(){{
-                srcRoot = "/home/boris/progs/work/autoshowroom/abstract_client/out/production/classes";
-                srcPackage = "com.mera.borisgk98.autoshowroom.client.models";
-                generationRoot = "/home/boris/progs/work/autoshowroom/abstract_client/src/main/java";
-                generationPackage = "com.mera.borisgk98.autoshowroom.client.shell.components";
+                srcRoot = "/home/boris/progs/autoshowroom/soap_client/build/classes/java/main";
+                srcPackage = "com.mera.borisgk98.autoshowroom.soapclient.model";
+                generationRoot = "/home/boris/progs/autoshowroom/soap_client/src/main/java";
+                generationPackage = "com.mera.borisgk98.autoshowroom.soapclient.component";
                 excludeModels = new HashSet<String>(){{
 //                    add("Auto");
                 }};
+                setTemplateSrc("/home/boris/progs/autoshowroom/soap_client/src/main/resources/templates/ShellComponent");
             }});
         }
         catch (GenerationPluginException e) {

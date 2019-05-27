@@ -8,6 +8,15 @@ public class GenerationPluginExtension {
     protected String srcPackage;
     protected String generationRoot;
     protected Set<String> excludeModels;
+    private String templateSrc;
+
+    public String getTemplateSrc() {
+        return templateSrc;
+    }
+
+    public void setTemplateSrc(String templateSrc) {
+        this.templateSrc = templateSrc;
+    }
 
     public Set<String> getExcludeModels() {
         return excludeModels;
