@@ -190,7 +190,25 @@ public class Generator {
             String setterName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
             builder.append(setterName);
             builder.append("(");
-            builder.append(name);
+
+            Class ftype = f.getType();
+            // примитивы
+            // список из объектов
+            if (Number.class.isAssignableFrom(ftype) ||
+                String.class.equals(ftype) ||
+                List.class.isAssignableFrom(ftype)
+            ) {
+                builder.append(ftype.getSimpleName());
+            }
+            // другой объект
+            else {
+                builder.append("new ");
+                builder.append(ftype.getSimpleName());
+                builder.append("(){{ setId(");
+                builder.append(name);
+                builder.append("); }}");
+            }
+
             builder.append(")");
             builder.append(";");
             builder.append("\n");

@@ -2,7 +2,7 @@ package com.mera.borisgk98.autoshowroom.client.shell.components.test;
 
 
 import com.mera.borisgk98.autoshowroom.client.exceptions.ModelNotFound;
-import com.mera.borisgk98.autoshowroom.client.models.$Model$;
+import com.mera.borisgk98.autoshowroom.client.models.*;
 import com.mera.borisgk98.autoshowroom.client.shell.components.AbstractShellComponent;
 import com.mera.borisgk98.autoshowroom.client.shell.components.ReadDeleteShellComponent;
 import org.springframework.shell.standard.ShellComponent;
