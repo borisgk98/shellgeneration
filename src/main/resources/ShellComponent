@@ -1,10 +1,15 @@
-package com.mera.borisgk98.autoshowroom.client.shell.components;
+package com.mera.borisgk98.autoshowroom.client.shell.components.test;
 
+
+import com.mera.borisgk98.autoshowroom.client.exceptions.ModelNotFound;
 import com.mera.borisgk98.autoshowroom.client.models.$Model$;
+import com.mera.borisgk98.autoshowroom.client.shell.components.AbstractShellComponent;
+import com.mera.borisgk98.autoshowroom.client.shell.components.ReadDeleteShellComponent;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import org.springframework.shell.table.Table;
+
 
 @ShellComponent
 public class $Model$ShellComponent extends AbstractShellComponent<$Model$> implements ReadDeleteShellComponent<$Model$> {
@@ -18,9 +23,9 @@ public class $Model$ShellComponent extends AbstractShellComponent<$Model$> imple
             value = "Create new $model$",
             key = "$model$ create"
     )
-    public String create(@ShellOption String name) {
+    public String create($paramsBlock$) {
         return crudService.create(new $Model$(){{
-            setName(name);
+               $settersBlock$
         }}).toString();
     }
 
@@ -29,10 +34,17 @@ public class $Model$ShellComponent extends AbstractShellComponent<$Model$> imple
             value = "Update $model$",
             key = "$model$ update"
     )
-    public String update(@ShellOption String name) {
-        return crudService.create(new $Model$(){{
-            $setters'Block$
-        }}).toString();
+    public String update(
+            @ShellOption Integer id, $paramsBlock$) {
+        try {
+            return crudService.update(new $Model$(){{
+                setId(id);
+                $settersBlock$
+            }}).toString();
+        }
+        catch (ModelNotFound e) {
+            return "Not found";
+        }
     }
 
     @Override

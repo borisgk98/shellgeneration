@@ -13,8 +13,8 @@ public class Main {
             generator.setUp(new GenerationPluginExtension(){{
                 srcRoot = "/home/boris/progs/work/autoshowroom/abstract_client/out/production/classes";
                 srcPackage = "com.mera.borisgk98.autoshowroom.client.models";
-                generationRoot = "/home/boris/progs/work/chellgeneration/src/main/java";
-                generationPackage = "test.generation";
+                generationRoot = "/home/boris/progs/work/autoshowroom/abstract_client/src/main/java";
+                generationPackage = "com.mera.borisgk98.autoshowroom.client.shell.components.test";
                 excludeModels = new HashSet<String>(){{
 //                    add("Auto");
                 }};

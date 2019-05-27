@@ -9,6 +9,7 @@ import org.antlr.stringtemplate.StringTemplate;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,14 +46,14 @@ public class Generator {
         if (!generationDir.exists()) {
             generationDir.mkdirs();
         }
-        generationPackageDir = srcDir.toPath().resolve(converter.convert(e.getGenerationPackage())).toFile();
+        generationPackageDir = generationDir.toPath().resolve(converter.convert(e.getGenerationPackage())).toFile();
         if (!generationPackageDir.exists()) {
             generationPackageDir.mkdirs();
         }
         classLoader = new ClassLoader(srcDir, srcPackage);
         models = getModelClasses();
         try {
-            String templateSrc = inputStreamToString(getClass().getClassLoader().getResourceAsStream(("ShellComponent")));
+            String templateSrc = getFileData(new File("/home/boris/progs/work/chellgeneration/src/main/resources/ShellComponent"));
             template = new StringTemplate(templateSrc);
         }
         catch (Exception ex) {
@@ -118,19 +119,93 @@ public class Generator {
     }
 
     private void generateShellComponent(Class m) {
-        List<String> fields = getFields(m);
-        String name = m.getSimpleName();
-        System.out.println(name + ":");
-        for (String s : fields) {
-            System.out.println("\t" + s);
-        }
-        System.out.println();
+        List<Field> fields = getFields(m);
+        String Model = m.getSimpleName();
+        String model = Model.toLowerCase();
+        String settersBlock = generateSettersBlock(fields);
+        String paramsBlock = generateParamsBlock(fields);
+
+        template.setAttribute("model", model);
+        template.setAttribute("Model", Model);
+        template.setAttribute("paramsBlock", paramsBlock);
+        template.setAttribute("settersBlock", settersBlock);
+
+        File out = generationPackageDir.toPath().resolve(Model + "ShellComponent.java").toFile();
+        writeStringDateToFile(out, template.toString());
+
+        template.reset();
     }
 
-    private List<String> getFields(Class m) {
-        List<String> res = new ArrayList<>();
+    protected void writeStringDateToFile(File file, String s) {
+        try {
+            this.logger.info(String.format("Write new class to %s", file.toPath().toString()));
+            Files.write(file.toPath(), s.getBytes(), new OpenOption[0]);
+        } catch (IOException var4) {
+            this.logger.warning("Cannot write file " + file);
+        }
+
+    }
+
+    private String generateParamsBlock(List<Field> fields) {
+        StringBuilder builder = new StringBuilder();
+        String tabLevel = "\t\t\t";
+        builder.append("\n");
+        for (int i = 0; i < fields.size(); i++) {
+            Field f = fields.get(i);
+            builder.append(tabLevel);
+            builder.append("@ShellOption ");
+            Class ftype = f.getType();
+            // примитивы
+            if (Number.class.isAssignableFrom(ftype) ||
+                String.class.equals(ftype)
+            ) {
+                builder.append(ftype.getSimpleName());
+            }
+            // список из объектов
+            else if (List.class.isAssignableFrom(ftype)) {
+                builder.append("List<Integer>");
+            }
+            // другой объект
+            else {
+                builder.append("Integer");
+            }
+            builder.append(" ");
+            builder.append(f.getName());
+            if (i != fields.size() - 1) {
+                builder.append(", ");
+            }
+            builder.append("\n");
+        }
+        return builder.toString();
+//        return "";
+    }
+
+    private String generateSettersBlock(List<Field> fields) {
+        StringBuilder builder = new StringBuilder();
+        String tabLevel = "\t\t\t";
+
+        for (int i = 0; i < fields.size(); i++) {
+            Field f = fields.get(i);
+            String name = f.getName();
+            String setterName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
+            builder.append(setterName);
+            builder.append("(");
+            builder.append(name);
+            builder.append(")");
+            builder.append(";");
+            builder.append("\n");
+        }
+
+        return builder.toString();
+    }
+
+    private List<Field> getFields(Class m) {
+        List<Field> res = new ArrayList<>();
         for (Field field : m.getDeclaredFields()) {
-            res.add(field.getName());
+            if (field.getName().equals("id")) {
+                continue;
+            }
+            res.add(field);
         }
         return res;
     }
