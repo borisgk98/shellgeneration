@@ -152,9 +152,18 @@ public class Generator {
         builder.append("\n");
         for (int i = 0; i < fields.size(); i++) {
             Field f = fields.get(i);
+            Class ftype = f.getType();
+
+            if (ftype.isEnum()) {
+                if (i == fields.size() - 1) {
+                    builder.deleteCharAt(builder.length() - 1);
+                    builder.deleteCharAt(builder.length() - 1);
+                }
+                continue;
+            }
+
             builder.append(tabLevel);
             builder.append("@ShellOption ");
-            Class ftype = f.getType();
             // примитивы
             if (Number.class.isAssignableFrom(ftype) ||
                 String.class.equals(ftype)
@@ -172,8 +181,9 @@ public class Generator {
             builder.append(" ");
             builder.append(f.getName());
             if (i != fields.size() - 1) {
-                builder.append(", ");
+                builder.append(",");
             }
+
             builder.append("\n");
         }
         return builder.toString();
@@ -186,12 +196,16 @@ public class Generator {
 
         for (int i = 0; i < fields.size(); i++) {
             Field f = fields.get(i);
+            Class ftype = f.getType();
+
+            if (ftype.isEnum()) {
+                continue;
+            }
+
             String name = f.getName();
             String setterName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
             builder.append(setterName);
             builder.append("(");
-
-            Class ftype = f.getType();
             // примитивы
             // список из объектов
             if (Number.class.isAssignableFrom(ftype) ||
