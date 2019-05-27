@@ -14,7 +14,7 @@ public class Main {
                 srcRoot = "/home/boris/progs/work/autoshowroom/abstract_client/out/production/classes";
                 srcPackage = "com.mera.borisgk98.autoshowroom.client.models";
                 generationRoot = "/home/boris/progs/work/autoshowroom/abstract_client/src/main/java";
-                generationPackage = "com.mera.borisgk98.autoshowroom.client.shell.components.test";
+                generationPackage = "com.mera.borisgk98.autoshowroom.client.shell.components";
                 excludeModels = new HashSet<String>(){{
 //                    add("Auto");
                 }};

@@ -154,7 +154,7 @@ public class Generator {
             Field f = fields.get(i);
             Class ftype = f.getType();
 
-            if (ftype.isEnum()) {
+            if (ftype.isEnum() || List.class.isAssignableFrom(ftype)) {
                 if (i == fields.size() - 1) {
                     builder.deleteCharAt(builder.length() - 1);
                     builder.deleteCharAt(builder.length() - 1);
@@ -169,10 +169,6 @@ public class Generator {
                 String.class.equals(ftype)
             ) {
                 builder.append(ftype.getSimpleName());
-            }
-            // список из объектов
-            else if (List.class.isAssignableFrom(ftype)) {
-                builder.append("List<Integer>");
             }
             // другой объект
             else {
@@ -201,18 +197,19 @@ public class Generator {
             if (ftype.isEnum()) {
                 continue;
             }
+            if (List.class.isAssignableFrom(ftype)) {
+                continue;
+            }
 
             String name = f.getName();
             String setterName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
             builder.append(setterName);
             builder.append("(");
             // примитивы
-            // список из объектов
             if (Number.class.isAssignableFrom(ftype) ||
-                String.class.equals(ftype) ||
-                List.class.isAssignableFrom(ftype)
+                String.class.equals(ftype)
             ) {
-                builder.append(ftype.getSimpleName());
+                builder.append(name);
             }
             // другой объект
             else {
