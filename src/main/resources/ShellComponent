@@ -13,6 +13,28 @@ public class $Model$ShellComponent extends AbstractShellComponent<$Model$> imple
         super($Model$.class);
     }
 
+    @ShellMethod(
+            prefix = "--",
+            value = "Create new $model$",
+            key = "$model$ create"
+    )
+    public String create(@ShellOption String name) {
+        return crudService.create(new $Model$(){{
+            setName(name);
+        }}).toString();
+    }
+
+    @ShellMethod(
+            prefix = "--",
+            value = "Update $model$",
+            key = "$model$ update"
+    )
+    public String update(@ShellOption String name) {
+        return crudService.create(new $Model$(){{
+            $setters'Block$
+        }}).toString();
+    }
+
     @Override
     @ShellMethod(
             prefix = "--",
